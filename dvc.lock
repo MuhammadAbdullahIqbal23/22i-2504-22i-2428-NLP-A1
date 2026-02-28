@@ -55,3 +55,23 @@ stages:
       hash: md5
       md5: 1cd2b186a1c08c76af420ec17835a547
       size: 4294
+  statistics:
+    cmd: python3 src/statistics.py
+    deps:
+    - path: data/processed/products_clean.csv
+      hash: md5
+      md5: 683fec11de5faf4b5f6dd6ee4325e313
+      size: 62657
+    - path: data/raw/products_raw.json
+      hash: md5
+      md5: 0f14a4252e99aecebeaedab718165a63
+      size: 149500
+    - path: src/statistics.py
+      hash: md5
+      md5: e9096d45e66e7c22d16402f7a7f32853
+      size: 6625
+    outs:
+    - path: reports/trend_summary.txt
+      hash: md5
+      md5: eb164813d28175783632f01b6b4063d8
+      size: 4227
