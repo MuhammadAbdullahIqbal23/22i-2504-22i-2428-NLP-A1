@@ -16,7 +16,7 @@ from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
 
 # Ensure NLTK data is present
-for pkg in ["punkt", "punkt_tab", "stopwords", "wordnet", "omw-1.4"]:
+for pkg in ["punkt", "punkt_tab", "stopwords", "wordnet"]:
     nltk.download(pkg, quiet=True)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")

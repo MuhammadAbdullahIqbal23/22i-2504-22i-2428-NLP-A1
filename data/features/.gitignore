@@ -1,0 +1,5 @@
+/vocab.json
+/bow_matrix.npy
+/onehot_matrix.npy
+/unigram_freq.json
+/bigram_freq.json

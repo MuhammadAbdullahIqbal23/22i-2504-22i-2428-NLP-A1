@@ -17,7 +17,7 @@
 \usepackage{tocloft}
 \usepackage{amsmath}
 \usepackage{caption}
-\usepackage{tcolorbox}
+\usepackage{framed}
 
 % ── Code listing style ──
 \definecolor{codebg}{RGB}{245,245,245}
@@ -43,12 +43,13 @@
 }
 
 % ── Command box ──
-\newtcolorbox{commandbox}[1][]{
-  colback=black!5!white,
-  colframe=black!75!white,
-  fonttitle=\bfseries\ttfamily,
-  title={Terminal Command},
-  #1
+\definecolor{cmdboxbg}{RGB}{242,242,242}
+\definecolor{cmdboxframe}{RGB}{64,64,64}
+\newenvironment{commandbox}[1][]{
+  \begin{framed}
+  \noindent\textbf{\ttfamily Terminal Command}\par\smallskip
+}{
+  \end{framed}
 }
 
 % ── Screenshot placeholder ──
@@ -103,7 +104,7 @@
 % ══════════════════════════════════════════════════════════════════════
 \section{Introduction}
 
-This report documents the design, implementation, and execution of a reproducible NLP data pipeline built for \textbf{TrendScope Analytics}. The pipeline collects product listings from the tech ecosystem, cleans and tokenizes textual data, generates multiple representations (Bag-of-Words, One-Hot Encoding, N-grams), detects near-duplicate titles using Minimum Edit Distance, estimates unigram language model probabilities, computes perplexity, and orchestrates the entire workflow via Apache Airflow.
+This report documents the design, implementation, and execution of a reproducible NLP data pipeline built for \textbf{TrendScope Analytics}. The pipeline collects product listings from the tech ecosystem, cleans and tokenizes textual data, generates multiple representations (Bag-of-Words, One-Hot Encoding, N-grams), detects near-duplicate titles using Minimum Edit Distance, estimates unigram language model probabilities, and orchestrates the entire workflow via Apache Airflow.
 
 \subsection{Business Objectives}
 \begin{itemize}
@@ -168,14 +169,11 @@ py -c "import nltk; nltk.download('punkt'); nltk.download('punkt_tab'); nltk.dow
 \end{lstlisting}
 \end{commandbox}
 
-\screenshotplaceholder{Terminal showing successful \texttt{pip install -r requirements.txt} output}{setup-pip-install}
-
-\textbf{How to take this screenshot:}
-\begin{enumerate}
-  \item Open a terminal/command prompt.
-  \item Run the pip install command shown above.
-  \item Capture the terminal output showing all packages installed successfully.
-\end{enumerate}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/seteup-pip-install.png}
+  \caption{Terminal showing successful \texttt{pip install -r requirements.txt} output}
+\end{figure}
 
 % ══════════════════════════════════════════════════════════════════════
 \section{Stage 1 — Data Acquisition}
@@ -216,19 +214,22 @@ python src/scraper.py
 \end{lstlisting}
 \end{commandbox}
 
-\screenshotplaceholder{Terminal output of \texttt{python src/scraper.py} showing progress logs and ``Saved 300 products'' message}{stage1-scraper-run}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/stage1-scraper-complete.png}
+  \caption{Terminal output of \texttt{python src/scraper.py} showing progress logs and saved products message}
+\end{figure}
 
 
 \subsection{Output Verification}
 
 
-\screenshotplaceholder{Terminal showing product count (300+) and a sample JSON entry from \texttt{products\_raw.json}}{stage1-verify-output}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/scraper-output-verfication.png}
+  \caption{Terminal showing product count and a sample JSON entry from \texttt{products\_raw.json}}
+\end{figure}
 
-\textbf{How to take this screenshot:}
-\begin{enumerate}
-  \item Run the Python one-liner shown above.
-  \item Capture the output showing the count and the first product entry.
-\end{enumerate}
 
 \subsection{Key Code — Rate Limiting \& Retry}
 
@@ -280,20 +281,18 @@ git commit -m "Initialize DVC"
 \end{lstlisting}
 \end{commandbox}
 
-\screenshotplaceholder{Terminal output of \texttt{dvc init} showing successful initialization}{stage2-dvc-init}
-
-\textbf{How to take this screenshot:}
-\begin{enumerate}
-  \item Run \texttt{dvc init} in the project root.
-  \item Capture the terminal confirmation message.
-\end{enumerate}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/initialized-and-configured-dvc.png}
+  \caption{Terminal output of \texttt{dvc init} showing successful initialization}
+\end{figure}
 
 \subsection{Configure Remote Storage (Google Drive)}
 
 \begin{commandbox}
 \begin{lstlisting}[language=bash,numbers=none]
 # Configure Google Drive as DVC remote
-dvc remote add -d myremote gdrive://1wfmB_n0sqYSHs5TS6Lq9v1G5ijthDkRS
+
 
 # Verify remote configuration
 dvc remote list
@@ -303,13 +302,11 @@ git commit -m "Configure DVC remote storage"
 \end{lstlisting}
 \end{commandbox}
 
-\screenshotplaceholder{Terminal showing \texttt{dvc remote list} output with the configured Google Drive remote}{stage2-dvc-remote}
-
-\textbf{How to take this screenshot:}
-\begin{enumerate}
-  \item Run the remote add command, then \texttt{dvc remote list}.
-  \item Capture the output showing the remote name and URL.
-\end{enumerate}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/initialized-and-configured-dvc.png}
+  \caption{Terminal showing \texttt{dvc remote list} output with the configured remote}
+\end{figure}
 
 \subsection{Version 1 — Track 300 Products}
 
@@ -326,13 +323,12 @@ dvc push
 \end{lstlisting}
 \end{commandbox}
 
-\screenshotplaceholder{Terminal showing \texttt{dvc add} and \texttt{dvc push} commands completing successfully for v1}{stage2-dvc-v1}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/tracking-dvc-tag-for-300-products.png}
+  \caption{Terminal showing \texttt{dvc add} and \texttt{dvc push} commands completing successfully for v1}
+\end{figure}
 
-\textbf{How to take this screenshot:}
-\begin{enumerate}
-  \item Run the dvc add, git commit, and dvc push commands above in sequence.
-  \item Capture the terminal output showing successful tracking and push.
-\end{enumerate}
 
 \subsection{Version 2 — Expand to 500 Products}
 
@@ -351,14 +347,11 @@ dvc push
 \end{lstlisting}
 \end{commandbox}
 
-\screenshotplaceholder{Terminal showing v2 dataset creation, dvc add, and dvc push for 500 products}{stage2-dvc-v2}
-
-\textbf{How to take this screenshot:}
-\begin{enumerate}
-  \item Run the scraper again with target 500.
-  \item Run the DVC tracking and push commands.
-  \item Capture the full terminal output.
-\end{enumerate}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/scrapped-500-products.png}
+  \caption{Terminal showing v2 dataset creation, dvc add, and dvc push for 500 products}
+\end{figure}
 
 \subsection{Verify Version History}
 
@@ -375,25 +368,23 @@ git log --oneline --all
 \end{lstlisting}
 \end{commandbox}
 
-\screenshotplaceholder{Terminal showing \texttt{git tag -l} listing v1, v2 and \texttt{git log --oneline} showing version commits}{stage2-version-history}
-
-\textbf{How to take this screenshot:}
-\begin{enumerate}
-  \item Run \texttt{git tag -l} and \texttt{git log --oneline --all}.
-  \item Capture both outputs in a single terminal window.
-\end{enumerate}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/tag-v2-listing.png}
+  \caption{Terminal showing \texttt{git tag -l} listing v1, v2 and \texttt{git log --oneline} showing version commits}
+\end{figure}
 
 \subsection{DVC Pipeline Configuration}
 
 \begin{lstlisting}[language={},caption={dvc.yaml — pipeline stages}]
 stages:
   scrape:
-    cmd: python src/scraper.py
+    cmd: python3 src/scraper.py
     outs:
       - data/raw/products_raw.json
 
   preprocess:
-    cmd: python src/preprocess.py
+    cmd: python3 src/preprocess.py
     deps:
       - data/raw/products_raw.json
       - src/preprocess.py
@@ -401,7 +392,7 @@ stages:
       - data/processed/products_clean.csv
 
   represent:
-    cmd: python src/representation.py
+    cmd: python3 src/representation.py
     deps:
       - data/processed/products_clean.csv
       - src/representation.py
@@ -413,7 +404,7 @@ stages:
       - data/features/bigram_freq.json
 
   statistics:
-    cmd: python src/statistics.py
+    cmd: python3 src/statistics.py
     deps:
       - data/processed/products_clean.csv
       - data/raw/products_raw.json
@@ -429,13 +420,11 @@ dvc repro
 \end{lstlisting}
 \end{commandbox}
 
-\screenshotplaceholder{Terminal output of \texttt{dvc repro} showing all stages executing in order}{stage2-dvc-repro}
-
-\textbf{How to take this screenshot:}
-\begin{enumerate}
-  \item Run \texttt{dvc repro} in the project root.
-  \item Capture the terminal showing each stage running sequentially.
-\end{enumerate}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/stage2-dvc-repro.png}
+  \caption{Terminal output of \texttt{dvc repro} showing all stages executing in order}
+\end{figure}
 
 % ══════════════════════════════════════════════════════════════════════
 \section{Stage 3 — Text Processing \& Representation}
@@ -465,13 +454,12 @@ python src/preprocess.py
 \end{lstlisting}
 \end{commandbox}
 
-\screenshotplaceholder{Terminal output of \texttt{python src/preprocess.py} showing ``Cleaned 300 records'' message}{stage3-preprocess-run}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/processed-data.png}
+  \caption{Terminal output of \texttt{python src/preprocess.py} showing cleaned records message}
+\end{figure}
 
-\textbf{How to take this screenshot:}
-\begin{enumerate}
-  \item Run \texttt{python src/preprocess.py} in the terminal.
-  \item Capture the output log showing the number of cleaned records.
-\end{enumerate}
 
 \subsection{Output Verification}
 
@@ -493,14 +481,11 @@ with open('data/processed/products_clean.csv') as f:
 \end{lstlisting}
 \end{commandbox}
 
-\screenshotplaceholder{Terminal showing 3 sample rows from \texttt{products\_clean.csv} with raw text, clean text, tokens, and token count}{stage3-verify-csv}
-
-\textbf{How to take this screenshot:}
-\begin{enumerate}
-  \item Run the Python preview command above.
-  \item Capture the output showing raw vs.\ clean text for 3 entries.
-\end{enumerate}
-
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/processed-data.png}
+  \caption{Terminal showing sample rows from \texttt{products\_clean.csv} with raw text, clean text, tokens, and token count}
+\end{figure}
 \subsection{Output Schema}
 
 \begin{table}[H]
@@ -533,6 +518,12 @@ def clean_text(text):
     return tokens
 \end{lstlisting}
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/product-clean.png}
+  \caption{Cleaned product data after preprocessing pipeline}
+\end{figure}
+
 \subsection{Version Cleaned Dataset with DVC}
 
 \begin{commandbox}
@@ -544,13 +535,11 @@ dvc push
 \end{lstlisting}
 \end{commandbox}
 
-\screenshotplaceholder{Terminal showing DVC tracking of the cleaned CSV file}{stage3-dvc-track}
-
-\textbf{How to take this screenshot:}
-\begin{enumerate}
-  \item Run the dvc add and git commit commands above.
-  \item Capture the terminal output.
-\end{enumerate}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/stage3-dvc-tracking-for-processed-data.png}
+  \caption{Terminal showing DVC tracking of the cleaned CSV file}
+\end{figure}
 
 % ══════════════════════════════════════════════════════════════════════
 \section{Stage 4 — Data Representation}
@@ -575,13 +564,12 @@ python src/representation.py
 \end{lstlisting}
 \end{commandbox}
 
-\screenshotplaceholder{Terminal output of \texttt{python src/representation.py} showing vocabulary size, matrix shapes, and saved file paths}{stage4-representation-run}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/stage-4-representation-terminal.png}
+  \caption{Terminal output of \texttt{python src/representation.py} showing vocabulary size, matrix shapes, and saved file paths}
+\end{figure}
 
-\textbf{How to take this screenshot:}
-\begin{enumerate}
-  \item Run \texttt{python src/representation.py}.
-  \item Capture the log output showing vocabulary size, One-Hot shape, and BoW shape.
-\end{enumerate}
 
 \subsection{Output Files}
 
@@ -620,13 +608,11 @@ python -c "import json; b=json.load(open('data/features/bigram_freq.json')); [pr
 \end{lstlisting}
 \end{commandbox}
 
-\screenshotplaceholder{Terminal showing vocab size, BoW matrix shape, and top 10 unigrams/bigrams}{stage4-verify-features}
-
-\textbf{How to take this screenshot:}
-\begin{enumerate}
-  \item Run all five verification commands above.
-  \item Capture the consolidated terminal output in one screenshot.
-\end{enumerate}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/stage4-verfiy-features.png}
+  \caption{Terminal showing vocab size, BoW matrix shape, and top 10 unigrams/bigrams}
+\end{figure}
 
 \subsection{Mathematical Background}
 
@@ -666,13 +652,11 @@ dvc push
 \end{lstlisting}
 \end{commandbox}
 
-\screenshotplaceholder{Terminal showing DVC tracking and push of feature files}{stage4-dvc-features}
-
-\textbf{How to take this screenshot:}
-\begin{enumerate}
-  \item Run the dvc add and push commands.
-  \item Capture the terminal output.
-\end{enumerate}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/stage4-dvc-features-terminal.png}
+  \caption{Terminal showing DVC tracking and push of feature files}
+\end{figure}
 
 % ══════════════════════════════════════════════════════════════════════
 \section{Stage 5 — Basic Linguistic Intelligence}
@@ -687,7 +671,6 @@ The statistics module (\texttt{src/statistics.py}) generates a comprehensive lin
   \item Vocabulary size and average description length
   \item Near-duplicate title detection using \textbf{Minimum Edit Distance}
   \item Unigram probability estimation (MLE)
-  \item Perplexity computation for 5 held-out descriptions
 \end{itemize}
 
 \subsection{Running Statistics}
@@ -698,13 +681,11 @@ python src/statistics.py
 \end{lstlisting}
 \end{commandbox}
 
-\screenshotplaceholder{Terminal output of \texttt{python src/statistics.py} showing ``Report saved'' message}{stage5-statistics-run}
-
-\textbf{How to take this screenshot:}
-\begin{enumerate}
-  \item Run \texttt{python src/statistics.py}.
-  \item Capture the log output.
-\end{enumerate}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/stage4-report-unigrams.png}
+  \caption{Terminal output of \texttt{python src/statistics.py} showing report saved message}
+\end{figure}
 
 \subsection{View the Report}
 
@@ -718,29 +699,24 @@ cat reports/trend_summary.txt
 \end{lstlisting}
 \end{commandbox}
 
-\screenshotplaceholder{Full content of \texttt{trend\_summary.txt} showing Top 30 unigrams section}{stage5-report-unigrams}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/stage4-report-unigrams.png}
+  \caption{Full content of \texttt{trend\_summary.txt} showing Top 30 unigrams section}
+\end{figure}
 
-\textbf{How to take this screenshot:}
-\begin{enumerate}
-  \item Open \texttt{reports/trend\_summary.txt} in a text editor or use \texttt{type}/\texttt{cat}.
-  \item Capture the Top 30 unigrams section.
-\end{enumerate}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/stage5-report-bigrams.png}
+  \caption{Content of \texttt{trend\_summary.txt} showing Top 20 bigrams and tag statistics}
+\end{figure}
 
-\screenshotplaceholder{Content of \texttt{trend\_summary.txt} showing Top 20 bigrams and tag statistics}{stage5-report-bigrams-tags}
 
-\textbf{How to take this screenshot:}
-\begin{enumerate}
-  \item Scroll down in the report file.
-  \item Capture the bigrams and tags sections.
-\end{enumerate}
-
-\screenshotplaceholder{Content of \texttt{trend\_summary.txt} showing near-duplicates, unigram probabilities, and perplexity scores}{stage5-report-duplicates-perplexity}
-
-\textbf{How to take this screenshot:}
-\begin{enumerate}
-  \item Scroll to the lower sections of the report.
-  \item Capture the near-duplicate detection results, unigram probabilities, and perplexity values.
-\end{enumerate}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/tag-1-listing.png}
+  \caption{Content of \texttt{trend\_summary.txt} showing near-duplicates and unigram probabilities}
+\end{figure}
 
 \subsection{Minimum Edit Distance — Algorithm}
 
@@ -779,20 +755,6 @@ The Maximum Likelihood Estimate (MLE) for unigram probability:
 \[
 P(w) = \frac{\text{count}(w)}{\sum_{w' \in V} \text{count}(w')}
 \]
-
-\subsection{Perplexity}
-
-Perplexity of a sequence $W = w_1 w_2 \ldots w_N$ under a unigram model with Laplace smoothing:
-\[
-PP(W) = 2^{-\frac{1}{N} \sum_{i=1}^{N} \log_2 P_{\text{smooth}}(w_i)}
-\]
-
-where:
-\[
-P_{\text{smooth}}(w) = \frac{\text{count}(w) + 1}{N + |V|}
-\]
-
-Lower perplexity indicates the language model assigns higher probability to the held-out text.
 
 % ══════════════════════════════════════════════════════════════════════
 \section{Stage 6 — Airflow Pipeline Orchestration}
@@ -859,13 +821,11 @@ airflow scheduler
 \end{lstlisting}
 \end{commandbox}
 
-\screenshotplaceholder{Terminal showing Airflow webserver starting on port 8080}{stage6-airflow-startup}
-
-\textbf{How to take this screenshot:}
-\begin{enumerate}
-  \item Run \texttt{airflow webserver --port 8080} in a terminal.
-  \item Capture the terminal showing the webserver is running.
-\end{enumerate}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/stage6-airflow-startup.png}
+  \caption{Terminal showing Airflow webserver starting on port 8080}
+\end{figure}
 
 \subsection{Trigger DAG and Monitor}
 
@@ -878,24 +838,11 @@ airflow dags trigger nlp_trend_pipeline
 \end{lstlisting}
 \end{commandbox}
 
-\screenshotplaceholder{Airflow Web UI showing the \texttt{nlp\_trend\_pipeline} DAG with all 5 tasks in the Graph view}{stage6-airflow-dag-graph}
-
-\textbf{How to take this screenshot:}
-\begin{enumerate}
-  \item Open \texttt{http://localhost:8080} in a web browser.
-  \item Navigate to the \texttt{nlp\_trend\_pipeline} DAG.
-  \item Click on ``Graph'' view to see the task dependency graph.
-  \item Capture the browser showing all 5 tasks connected in sequence.
-\end{enumerate}
-
-\screenshotplaceholder{Airflow Web UI showing successful DAG run with all tasks marked green (success)}{stage6-airflow-dag-success}
-
-\textbf{How to take this screenshot:}
-\begin{enumerate}
-  \item After triggering the DAG, wait for all tasks to complete.
-  \item In the web UI, go to the DAG's Tree or Grid view.
-  \item Capture the browser showing all tasks with green (success) status.
-\end{enumerate}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/stage6-airflow-dag-grid.png}
+  \caption{Airflow UI showing the \texttt{nlp\_trend\_dag} DAG grid view with task execution status and Graph tab depicting the pipeline dependency chain: \texttt{scrape\_data} $\rightarrow$ \texttt{preprocess\_data} $\rightarrow$ \texttt{generate\_features} $\rightarrow$ \texttt{compute\_statistics} $\rightarrow$ \texttt{dvc\_push}}
+\end{figure}
 
 \subsection{Key Code — DAG Definition}
 
@@ -979,13 +926,11 @@ airflow dags trigger nlp_trend_pipeline
 \end{lstlisting}
 \end{commandbox}
 
-\screenshotplaceholder{Terminal showing complete pipeline execution output (all stages) using Option A or Option B}{full-pipeline-execution}
-
-\textbf{How to take this screenshot:}
-\begin{enumerate}
-  \item Run all four Python scripts in sequence (Option A) or run \texttt{dvc repro} (Option B).
-  \item Capture the complete terminal output showing all stages executing.
-\end{enumerate}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/full-pipeline-executiion.png}
+  \caption{Terminal showing complete pipeline execution output (all stages)}
+\end{figure}
 
 % ══════════════════════════════════════════════════════════════════════
 \section{Summary of NLP Concepts Applied}
@@ -1005,65 +950,10 @@ Bigram Frequency           & 4, 5 & Sliding window bigram counter \\
 Vocabulary Extraction      & 4 & Sorted unique token set \\
 Minimum Edit Distance      & 5 & DP-based Levenshtein implementation \\
 Language Model (Unigram)   & 5 & MLE probability estimation \\
-Perplexity                 & 5 & Laplace-smoothed unigram model \\
 \bottomrule
 \end{tabular}
 \caption{NLP concepts mapped to pipeline stages}
 \end{table}
-
-% ══════════════════════════════════════════════════════════════════════
-\section{Screenshot Checklist}
-
-The following table lists all required screenshots for the report. Replace each placeholder with an actual screenshot.
-
-\begin{table}[H]
-\centering
-\small
-\begin{tabular}{@{}clp{7cm}@{}}
-\toprule
-\textbf{\#} & \textbf{Label} & \textbf{What to Capture} \\ \midrule
-1  & title-project-structure       & Project folder structure in file explorer / VS Code \\
-2  & setup-pip-install             & Terminal: \texttt{pip install -r requirements.txt} output \\
-3  & stage1-scraper-run            & Terminal: Scraper execution with logs \\
-4  & stage1-verify-output          & Terminal: Product count \& sample JSON entry \\
-5  & stage2-dvc-init               & Terminal: \texttt{dvc init} output \\
-6  & stage2-dvc-remote             & Terminal: \texttt{dvc remote list} output \\
-7  & stage2-dvc-v1                 & Terminal: DVC add \& push for v1 (300 products) \\
-8  & stage2-dvc-v2                 & Terminal: DVC add \& push for v2 (500 products) \\
-9  & stage2-version-history        & Terminal: \texttt{git tag -l} and \texttt{git log --oneline} \\
-10 & stage2-dvc-repro              & Terminal: \texttt{dvc repro} output \\
-11 & stage3-preprocess-run         & Terminal: Preprocessing execution log \\
-12 & stage3-verify-csv             & Terminal: Sample rows from cleaned CSV \\
-13 & stage3-dvc-track              & Terminal: DVC tracking of cleaned data \\
-14 & stage4-representation-run     & Terminal: Feature generation with matrix shapes \\
-15 & stage4-verify-features        & Terminal: Vocab size, matrix shapes, top N-grams \\
-16 & stage4-dvc-features           & Terminal: DVC tracking of feature files \\
-17 & stage5-statistics-run         & Terminal: Statistics script execution \\
-18 & stage5-report-unigrams        & Report: Top 30 unigrams section \\
-19 & stage5-report-bigrams-tags    & Report: Top 20 bigrams and tag statistics \\
-20 & stage5-report-duplicates-perplexity & Report: Near-duplicates and perplexity \\
-21 & stage6-airflow-startup        & Terminal: Airflow webserver starting \\
-22 & stage6-airflow-dag-graph      & Browser: Airflow DAG Graph view \\
-23 & stage6-airflow-dag-success    & Browser: Airflow DAG success (all green) \\
-24 & full-pipeline-execution       & Terminal: Complete pipeline run (all stages) \\
-\bottomrule
-\end{tabular}
-\caption{Complete screenshot checklist — 24 screenshots total}
-\end{table}
-
-\textbf{To replace a placeholder with an actual screenshot:}
-\begin{enumerate}
-  \item Save your screenshot as a \texttt{.png} file (e.g., \texttt{screenshots/stage1-scraper-run.png}).
-  \item Create a \texttt{screenshots/} folder in the same directory as this \texttt{.tex} file.
-  \item Replace the \texttt{\textbackslash screenshotplaceholder} command with:
-\begin{lstlisting}[language=TeX,numbers=none]
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.9\textwidth]{screenshots/stage1-scraper-run.png}
-  \caption{Your caption here}
-\end{figure}
-\end{lstlisting}
-\end{enumerate}
 
 % ══════════════════════════════════════════════════════════════════════
 \section{Conclusion}
@@ -1076,7 +966,7 @@ This project delivers a complete, reproducible NLP data engineering pipeline for
   \item Cleans text via a 10-step NLP preprocessing pipeline.
   \item Generates BoW, One-Hot, unigram, and bigram representations from scratch.
   \item Detects near-duplicate titles via Minimum Edit Distance.
-  \item Estimates unigram probabilities and computes perplexity for held-out data.
+  \item Estimates unigram probabilities.
   \item Orchestrates the entire workflow via an Apache Airflow DAG.
 \end{itemize}
 

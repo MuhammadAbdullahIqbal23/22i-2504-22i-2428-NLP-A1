@@ -1,11 +1,11 @@
 stages:
   scrape:
-    cmd: python src/scraper.py
+    cmd: python3 src/scraper.py
     outs:
       - data/raw/products_raw.json
 
   preprocess:
-    cmd: python src/preprocess.py
+    cmd: python3 src/preprocess.py
     deps:
       - data/raw/products_raw.json
       - src/preprocess.py
@@ -13,7 +13,7 @@ stages:
       - data/processed/products_clean.csv
 
   represent:
-    cmd: python src/representation.py
+    cmd: python3 src/representation.py
     deps:
       - data/processed/products_clean.csv
       - src/representation.py
@@ -25,7 +25,7 @@ stages:
       - data/features/bigram_freq.json
 
   statistics:
-    cmd: python src/statistics.py
+    cmd: python3 src/statistics.py
     deps:
       - data/processed/products_clean.csv
       - data/raw/products_raw.json

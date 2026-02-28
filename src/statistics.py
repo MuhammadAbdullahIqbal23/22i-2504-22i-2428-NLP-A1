@@ -1,12 +1,11 @@
 """
 Stage 5 — Basic Linguistic Intelligence
 Generates trend_summary.txt with unigram/bigram rankings, tag stats,
-duplicate detection via Minimum Edit Distance, and perplexity estimation.
+duplicate detection via Minimum Edit Distance.
 """
 
 import csv
 import json
-import math
 import os
 import logging
 from collections import Counter
@@ -41,31 +40,13 @@ def min_edit_distance(s1, s2):
     return dp[m][n]
 
 
-# ── Unigram language model & perplexity ──
+# ── Unigram language model ──
 def compute_unigram_probs(docs):
     """Return dict of token -> probability based on MLE."""
     counter = Counter(tok for doc in docs for tok in doc)
     total = sum(counter.values())
     probs = {tok: count / total for tok, count in counter.items()}
     return probs
-
-
-def perplexity(tokens, probs, vocab_size):
-    """
-    Perplexity of a token sequence under a unigram model.
-    Uses Laplace (add-1) smoothing for unseen tokens.
-    """
-    total_count = sum(1 for _ in probs.values())  # acts as N for smoothing
-    n = len(tokens)
-    if n == 0:
-        return float("inf")
-    log_prob_sum = 0.0
-    for tok in tokens:
-        p = probs.get(tok, 0)
-        # Laplace smoothing
-        p_smooth = (p * total_count + 1) / (total_count + vocab_size)
-        log_prob_sum += math.log2(p_smooth)
-    return 2 ** (-log_prob_sum / n)
 
 
 def run(clean_path=None, raw_path=None):
@@ -128,14 +109,6 @@ def run(clean_path=None, raw_path=None):
     # ── Unigram probabilities ──
     probs = compute_unigram_probs(docs)
 
-    # ── Perplexity for 5 held-out descriptions ──
-    held_out = docs[-5:] if len(docs) >= 5 else docs
-    held_out_raw = raw_texts[-5:] if len(raw_texts) >= 5 else raw_texts
-    perplexities = []
-    for tokens in held_out:
-        pp = perplexity(tokens, probs, vocab_size)
-        perplexities.append(pp)
-
     # ── Write report ──
     report_path = os.path.join(REPORT_DIR, "trend_summary.txt")
     with open(report_path, "w", encoding="utf-8") as rpt:
@@ -174,11 +147,6 @@ def run(clean_path=None, raw_path=None):
         rpt.write("-" * 40 + "\n")
         for word, freq in top30_uni[:15]:
             rpt.write(f"  P({word}) = {probs[word]:.6f}\n")
-
-        rpt.write("\nPERPLEXITY FOR 5 HELD-OUT DESCRIPTIONS\n")
-        rpt.write("-" * 40 + "\n")
-        for i, (pp, raw) in enumerate(zip(perplexities, held_out_raw)):
-            rpt.write(f"  [{i+1}] \"{raw[:60]}...\"  →  perplexity = {pp:.2f}\n")
 
     logger.info("Report saved → %s", report_path)
     return report_path

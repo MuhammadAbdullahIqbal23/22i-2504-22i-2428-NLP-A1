@@ -1,4 +1,5 @@
 [core]
     remote = myremote
 ['remote "myremote"']
-    url = gdrive://1wfmB_n0sqYSHs5TS6Lq9v1G5ijthDkRS
+    url = s3://nlp-assignment-1
+    endpointurl = http://localhost:9000
