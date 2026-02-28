@@ -23,3 +23,35 @@ stages:
       hash: md5
       md5: 683fec11de5faf4b5f6dd6ee4325e313
       size: 62657
+  represent:
+    cmd: python3 src/representation.py
+    deps:
+    - path: data/processed/products_clean.csv
+      hash: md5
+      md5: 683fec11de5faf4b5f6dd6ee4325e313
+      size: 62657
+    - path: src/representation.py
+      hash: md5
+      md5: 26be4200b2d0dd7eca6b1ee9092cc1f9
+      size: 3605
+    outs:
+    - path: data/features/bigram_freq.json
+      hash: md5
+      md5: d7dce5e7b487f4819b261a7bbb6d2444
+      size: 29930
+    - path: data/features/bow_matrix.npy
+      hash: md5
+      md5: 8677c33b141ca5e66bd1bab3f0ca165f
+      size: 626128
+    - path: data/features/onehot_matrix.npy
+      hash: md5
+      md5: 3de72c7eeae23badaced974a8481e7b4
+      size: 6388
+    - path: data/features/unigram_freq.json
+      hash: md5
+      md5: 968eb2bcbf1de4e311cfa369e75454a3
+      size: 9673
+    - path: data/features/vocab.json
+      hash: md5
+      md5: 1cd2b186a1c08c76af420ec17835a547
+      size: 4294
