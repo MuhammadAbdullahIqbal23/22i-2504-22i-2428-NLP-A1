@@ -5,5 +5,5 @@ stages:
     outs:
     - path: data/raw/products_raw.json
       hash: md5
-      md5: 5b17eb7add72b71059f593c00bf9b119
-      size: 86690
+      md5: 0f14a4252e99aecebeaedab718165a63
+      size: 149500
